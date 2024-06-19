@@ -1,0 +1,59 @@
+package MandelbrotSet;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+public class MandelbrotSet extends JPanel {
+    private final int WIDTH = 800;
+    private final int HEIGHT = 800;
+    private final int MAX_ITER = 1000;
+
+    public MandelbrotSet() {
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        BufferedImage image = createMandelbrotImage();
+        g.drawImage(image, 0, 0, null);
+    }
+
+    private BufferedImage createMandelbrotImage() {
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                double zx = 0;
+                double zy = 0;
+                double cX = (x - WIDTH / 2.0) * 4.0 / WIDTH;
+                double cY = (y - HEIGHT / 2.0) * 4.0 / HEIGHT;
+                int iter = 0;
+
+                while (zx * zx + zy * zy < 4.0 && iter < MAX_ITER) {
+                    double tmp = zx * zx - zy * zy + cX;
+                    zy = 2.0 * zx * zy + cY;
+                    zx = tmp;
+                    iter++;
+                }
+
+                int color = Color.HSBtoRGB((float) iter / MAX_ITER, 1, 50);
+                image.setRGB(x, y, color);
+            }
+        }
+
+        return image;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Mandelbrot Set");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new MandelbrotSet());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
